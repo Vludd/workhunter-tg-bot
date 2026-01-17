@@ -19,6 +19,6 @@ class ProfileInfoDTO:
     following: bool
 
 @dataclass(frozen=True)
-class ProfileStep:
+class ProfileSetupStep:
     state: State
     template: Callable[[], CardTemplateDTO]

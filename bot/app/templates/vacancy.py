@@ -60,6 +60,8 @@ def vacancy_card(vacancy: VacancyDTO) -> CardTemplateDTO:
     
     if vacancy.url:
         buttons.append([InlineKeyboardButton(text="🔗 Подробнее", url=vacancy.url)])
+        
+    buttons.append([InlineKeyboardButton(text="↩️ Назад", callback_data=f"vacancy_item:back")])
     
     template = CardTemplateDTO(
         text=text,

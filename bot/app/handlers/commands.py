@@ -1,7 +1,7 @@
 from aiogram.types import Message
 from aiogram.types import InlineKeyboardMarkup
 
-from app.templates.profile import profile_card
+from app.templates.main_menu import show_main_menu
 
 
 async def start(msg: Message):
@@ -11,7 +11,7 @@ async def start(msg: Message):
     
     username = user.username
     
-    card = profile_card(False, username)
+    card = show_main_menu(False, username)
     await msg.answer(
         text=card.text,
         reply_markup=InlineKeyboardMarkup(inline_keyboard=card.buttons) if card.buttons else None

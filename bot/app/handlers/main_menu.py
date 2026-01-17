@@ -1,24 +1,21 @@
-from aiogram import Router, F
 from aiogram.types import CallbackQuery
 from aiogram.fsm.context import FSMContext
-
-from aiogram.types import Message
-from aiogram.types import InlineKeyboardMarkup
+from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup
 
 from app.dto.template import CardTemplateDTO
 from app.fsm.profile import ProfileSetup
 from app.handlers.vacancies import test_vacancy_card
-from app.templates.profile import profile_card, get_setup_template
+from app.templates.main_menu import show_main_menu, get_setup_template
 
 
-async def show_profile(msg: Message):
+async def render_main_menu(msg: Message):
     user = msg.from_user
     if not user or not user.username:
         return
     
     username = user.username
     
-    card = profile_card(True, username)
+    card = show_main_menu(True, username)
     await msg.answer(
         text=card.text,
         reply_markup=InlineKeyboardMarkup(inline_keyboard=card.buttons) if card.buttons else None
@@ -35,6 +32,24 @@ async def set_skills(msg: Message, state: FSMContext):
         text=msg_template.text,
         reply_markup=InlineKeyboardMarkup(inline_keyboard=msg_template.buttons) if msg_template.buttons else None
     )
+    
+async def render_main_menu_callback(cq: CallbackQuery):
+    await cq.answer()
+    
+    if not isinstance(cq.message, Message):
+        return
+    
+    user = cq.message.from_user
+    if not user or not user.username:
+        return
+    
+    username = user.username
+    
+    card = show_main_menu(True, username)
+    await cq.message.edit_text(
+        text=card.text,
+        reply_markup=InlineKeyboardMarkup(inline_keyboard=card.buttons) if card.buttons else None
+    )
 
 async def start_callback(cq: CallbackQuery, state: FSMContext):
     await cq.answer()
@@ -50,7 +65,7 @@ async def start_callback(cq: CallbackQuery, state: FSMContext):
         reply_markup=InlineKeyboardMarkup(inline_keyboard=template.buttons) if template.buttons else None
     )
 
-async def show_vacancies_callback(cq: CallbackQuery):
+async def render_vacancies_callback(cq: CallbackQuery):
     await cq.answer()
     
     if not isinstance(cq.message, Message):
