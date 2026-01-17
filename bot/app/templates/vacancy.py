@@ -14,14 +14,26 @@ def posted_time_ago(posted_at: datetime) -> str:
     seconds = int(delta.total_seconds())
 
     minutes = seconds // 60
-    hours = seconds // 3600
+    hours = minutes // 60
+    days =  hours // 24
+    weeks = days // 14
+    month = days // 30
+    years = month // 12
     
-    if hours > 0:
-        posted_at_text = f"{hours} час(-ов) назад"
+    if years > 0:
+        posted_at_text = f"{years} г. назад"
+    elif month > 0:
+        posted_at_text = f"{month} мес. назад"
+    elif weeks > 0:
+        posted_at_text = f"{weeks} нед. назад"
+    elif days > 0:
+        posted_at_text = f"{days} дн. назад"
+    elif hours > 0:
+        posted_at_text = f"{hours} ч. назад"
     elif minutes > 0:
-        posted_at_text = f"{minutes} минут(-ы) назад"
+        posted_at_text = f"{minutes} мин. назад"
     else:
-        posted_at_text = f"{seconds} секунд(-ы) назад"
+        posted_at_text = f"{seconds} сек. назад"
     
     return posted_at_text
     
@@ -40,8 +52,10 @@ def vacancy_card(vacancy: VacancyDTO) -> CardTemplateDTO:
     text += f"🔗 Источник: {vacancy.source}\n" if vacancy.source else ""
     
     buttons = [
-        [InlineKeyboardButton(text="⭐ В избранное", callback_data=f"fav:{vacancy.id}"),
-         InlineKeyboardButton(text="❌ Пропустить", callback_data=f"skip:{vacancy.id}")],
+        [
+            InlineKeyboardButton(text="⭐ В избранное", callback_data=f"fav:{vacancy.id}"),
+            InlineKeyboardButton(text="❌ Пропустить", callback_data=f"skip:{vacancy.id}")
+        ]
     ]
     
     if vacancy.url:

@@ -1,11 +1,18 @@
 from aiogram.types import Message
+from aiogram.types import InlineKeyboardMarkup
 
-from app.services.commands import start_command
+from app.templates.profile import profile_card
 
 
 async def start(msg: Message):
-    if msg.from_user is None:
+    user = msg.from_user
+    if not user or not user.username:
         return
     
-    text = start_command(msg.from_user.id)
-    await msg.answer(text)
+    username = user.username
+    
+    card = profile_card(False, username)
+    await msg.answer(
+        text=card.text,
+        reply_markup=InlineKeyboardMarkup(inline_keyboard=card.buttons) if card.buttons else None
+    )
