@@ -6,11 +6,16 @@ from typing import Callable
 from app.dto.template import CardTemplateDTO
 
 @dataclass
-class ProfileFilterDTO:
+class ProfileDTO:
+    id: Optional[int]
+    username: Optional[str]
+    
     skills: List[Optional[str]]
-    level: Optional[str]
+    experience: Optional[str]
     location: Optional[str]
-    payment: int
+    salary: Optional[str]
+    
+    completed: bool = False
 
 @dataclass
 class ProfileInfoDTO:

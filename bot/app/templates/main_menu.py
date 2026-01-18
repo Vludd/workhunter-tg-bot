@@ -1,5 +1,5 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from app.dto.profile import ProfileSetupStep
+from app.dto.profile import ProfileDTO, ProfileSetupStep
 from app.dto.vacancy import VacancyDTO
 from app.dto.template import CardTemplateDTO
 from datetime import datetime, timezone
@@ -8,27 +8,33 @@ from app.fsm.profile import ProfileSetup
 from aiogram.fsm.context import FSMContext
 
 
-def show_main_menu(profile_completed: bool, username: Optional[str], stats: dict = {}) -> CardTemplateDTO:
-    if profile_completed:
-        return main_menu(username, stats)
+def show_main_menu(user_data: ProfileDTO) -> CardTemplateDTO:
+    if user_data.completed:
+        return main_menu(user_data)
     
     return welcome_card()
 
-def main_menu(username: Optional[str], stats: dict = {}) -> CardTemplateDTO:
+def main_menu(user_data: ProfileDTO, stats: dict = {}) -> CardTemplateDTO:
     vacancies_count: int = stats.get("vacancies_count", 0)
     favorites_count: int = stats.get("favorites_count", 0)
     is_following: bool = stats.get("is_following", False)
     vacancy_series: bool = stats.get("vacancy_series", 0)
     
-    text = f"С возвращением, {username} 👋\n\n" if username else "С возвращением 👋\n\n"
+    text = f"С возвращением, {user_data.username} 👋\n" if user_data.username else "С возвращением 👋\n"
+    text += f"🔥 _{vacancy_series} вакансий подряд: Ты сегодня в ударе!_\n\n" if vacancy_series >= 5 else "\n"
     
-    text += f"🔍 Новых вакансий сегодня: {vacancies_count}\n"
-    text += f"⭐ В избранном: {favorites_count}\n"
-    text += f"📣 Авто-отслеживание: {'Включено ✅' if is_following else 'Отключено ❌'}\n\n"
-    
-    text += f"🔥 _{vacancy_series} вакансий подряд: Ты сегодня в ударе!_\n\n" if vacancy_series >= 5 else ""
-    
-    text += f"Выберите действие:\n\n"
+    text += (
+        f"🔍 Новых вакансий сегодня: {vacancies_count}\n"
+        f"⭐ В избранном: {favorites_count}\n"
+        f"📣 Авто-отслеживание: {'Включено ✅' if is_following else 'Отключено ❌'}\n\n"
+        
+        f"🧠 Навыки: {('`' + ', '.join(map(str, user_data.skills)).lower() + '`') if user_data.skills else '—'}\n"
+        f"💼 Уровень опыта: {user_data.experience if user_data.experience else '—'}\n"
+        f"🌍 Локация: {user_data.location if user_data.location else '—'}\n"
+        f"💰 Ожидаемая ЗП: {user_data.salary if user_data.salary else '—'}\n"
+        
+        f"Выберите действие:\n\n"
+    )
     
     buttons = [
         [InlineKeyboardButton(text="🔍 К вакансиям", callback_data=f"main_menu:vacancies")],
@@ -94,7 +100,7 @@ def setup_experience_card() -> CardTemplateDTO:
         [InlineKeyboardButton(text="🟢 Junior (0–1)", callback_data=f"profile_experience:junior")],
         [InlineKeyboardButton(text="🔵 Middle (1–3)", callback_data=f"profile_experience:middle")],
         [InlineKeyboardButton(text="🟣 Senior (3+)", callback_data=f"profile_experience:senior")],
-        [InlineKeyboardButton(text="⚪ Не важно", callback_data=f"profile_experience:any")],
+        [InlineKeyboardButton(text="— Не важно", callback_data=f"profile_experience:any")],
     ]
     
     template = CardTemplateDTO(

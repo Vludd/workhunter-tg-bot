@@ -2,6 +2,7 @@ from aiogram.types import CallbackQuery
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup
 
+from app.api.user import get_user_data
 from app.dto.template import CardTemplateDTO
 from app.fsm.profile import ProfileSetup
 from app.handlers.vacancies import test_vacancy_card
@@ -15,7 +16,12 @@ async def render_main_menu(msg: Message):
     
     username = user.username
     
-    card = show_main_menu(True, username)
+    user = get_user_data()
+    
+    if not user.username:
+        user.username = username
+    
+    card = show_main_menu(user)
     await msg.answer(
         text=card.text,
         reply_markup=InlineKeyboardMarkup(inline_keyboard=card.buttons) if card.buttons else None
@@ -43,9 +49,9 @@ async def render_main_menu_callback(cq: CallbackQuery):
     if not user or not user.username:
         return
     
-    username = user.username
+    user = get_user_data()
     
-    card = show_main_menu(True, username)
+    card = show_main_menu(user)
     await cq.message.edit_text(
         text=card.text,
         reply_markup=InlineKeyboardMarkup(inline_keyboard=card.buttons) if card.buttons else None
