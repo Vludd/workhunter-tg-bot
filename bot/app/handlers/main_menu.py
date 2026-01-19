@@ -11,17 +11,15 @@ from app.templates.main_menu import show_main_menu, get_setup_template
 
 async def render_main_menu(msg: Message):
     user = msg.from_user
-    if not user or not user.username:
+    if not user:
         return
     
-    username = user.username
+    user_data = get_user_data()
+    if not user_data.username:
+        if user.full_name:
+            user_data.username = user.full_name
     
-    user = get_user_data()
-    
-    if not user.username:
-        user.username = username
-    
-    card = show_main_menu(user)
+    card = show_main_menu(user_data)
     await msg.answer(
         text=card.text,
         reply_markup=InlineKeyboardMarkup(inline_keyboard=card.buttons) if card.buttons else None
@@ -46,18 +44,21 @@ async def render_main_menu_callback(cq: CallbackQuery):
         return
     
     user = cq.message.from_user
-    if not user or not user.username:
+    if not user:
         return
     
-    user = get_user_data()
+    user_data = get_user_data()
+    if not user_data.username:
+        if user.full_name:
+            user_data.username = user.full_name
     
-    card = show_main_menu(user)
+    card = show_main_menu(user_data)
     await cq.message.edit_text(
         text=card.text,
         reply_markup=InlineKeyboardMarkup(inline_keyboard=card.buttons) if card.buttons else None
     )
 
-async def start_callback(cq: CallbackQuery, state: FSMContext):
+async def start_setup_callback(cq: CallbackQuery, state: FSMContext):
     await cq.answer()
     
     if not isinstance(cq.message, Message):
