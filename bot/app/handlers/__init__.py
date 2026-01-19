@@ -3,10 +3,10 @@ from aiogram import Dispatcher, F
 from app.fsm.profile import ProfileSetup
 from app.handlers.main_menu import (
     set_skills, render_main_menu, 
-    render_vacancies_callback, start_setup_callback, render_main_menu_callback
+    start_setup_callback, render_main_menu_callback
 )
 
-from app.handlers.vacancies import render_vacancies
+from app.handlers.vacancies import render_vacancies, render_vacancies_callback
 from app.handlers.favorites import render_favorites, render_favorites_callback
 
     
@@ -17,6 +17,7 @@ def register_handlers(dp: Dispatcher):
     dp.message.register(render_favorites, F.text == "/favorites")
     
     dp.message.register(set_skills, ProfileSetup.skills, F.text.len() > 1)
+    
     dp.callback_query.register(start_setup_callback, F.data == "profile_setup:start")
     
     dp.callback_query.register(render_vacancies_callback, F.data == "main_menu:vacancies")

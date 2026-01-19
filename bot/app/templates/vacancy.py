@@ -1,4 +1,5 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from app.dto.profile import ProfileDTO
 from app.dto.vacancy import VacancyDTO
 from app.dto.template import CardTemplateDTO
 from datetime import datetime, timezone
@@ -53,7 +54,7 @@ def vacancy_card(vacancy: VacancyDTO) -> CardTemplateDTO:
     
     buttons = [
         [
-            InlineKeyboardButton(text="⭐ В избранное", callback_data=f"fav:{vacancy.id}"),
+            InlineKeyboardButton(text="💾 Сохранить", callback_data=f"fav:{vacancy.id}"),
             InlineKeyboardButton(text="❌ Пропустить", callback_data=f"skip:{vacancy.id}")
         ]
     ]
@@ -66,6 +67,25 @@ def vacancy_card(vacancy: VacancyDTO) -> CardTemplateDTO:
     template = CardTemplateDTO(
         text=text,
         buttons=buttons
+    )
+    
+    return template
+
+
+def searching_vacancies_card(user_data: ProfileDTO) -> CardTemplateDTO:
+    text = (
+        "🔍 Ищу подходящие вакансии под твой профиль...\n\n"
+
+        f"🧠 Навыки: {', '.join(map(str, user_data.skills)) if user_data.skills else '—'}\n"
+        f"💼 Уровень: {user_data.experience or '—'}\n"
+        f"🌍 Локация: {user_data.location or '—'}\n\n"
+
+        "⏳ _Это занимает 2–5 секунд_"
+    )
+    
+    template = CardTemplateDTO(
+        text=text,
+        buttons=[]
     )
     
     return template

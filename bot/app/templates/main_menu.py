@@ -31,17 +31,17 @@ def main_menu(user_data: ProfileDTO, stats: dict = {}) -> CardTemplateDTO:
         f"🧠 Навыки: {('`' + ', '.join(map(str, user_data.skills)).lower() + '`') if user_data.skills else '—'}\n"
         f"💼 Уровень опыта: {user_data.experience if user_data.experience else '—'}\n"
         f"🌍 Локация: {user_data.location if user_data.location else '—'}\n"
-        f"💰 Ожидаемая ЗП: {user_data.salary if user_data.salary else '—'}\n"
+        f"💰 Ожидаемая ЗП: {user_data.salary if user_data.salary else '—'}\n\n"
         
         f"Выберите действие:\n\n"
     )
     
     buttons = [
         [InlineKeyboardButton(text="🔍 К вакансиям", callback_data=f"main_menu:vacancies")],
-        [InlineKeyboardButton(text="📊 Срез рынка", callback_data=f"main_menu:market")],
+        # [InlineKeyboardButton(text="📊 Срез рынка", callback_data=f"main_menu:market")],
         [
             InlineKeyboardButton(text="⭐ Избранное", callback_data=f"main_menu:favorites"),
-            InlineKeyboardButton(text="🏆 Достижения", callback_data=f"main_menu:achievements")
+            # InlineKeyboardButton(text="🏆 Достижения", callback_data=f"main_menu:achievements")
         ],
         [InlineKeyboardButton(text="⚙️ Настройки", callback_data=f"main_menu:settings")]
     ]

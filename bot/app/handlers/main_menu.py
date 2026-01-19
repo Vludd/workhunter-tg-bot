@@ -72,14 +72,3 @@ async def start_setup_callback(cq: CallbackQuery, state: FSMContext):
         reply_markup=InlineKeyboardMarkup(inline_keyboard=template.buttons) if template.buttons else None
     )
 
-async def render_vacancies_callback(cq: CallbackQuery):
-    await cq.answer()
-    
-    if not isinstance(cq.message, Message):
-        return
-    
-    template: CardTemplateDTO = test_vacancy_card()
-    await cq.message.edit_text(
-        text=template.text,
-        reply_markup=InlineKeyboardMarkup(inline_keyboard=template.buttons) if template.buttons else None
-    )

@@ -1,10 +1,11 @@
+import asyncio
 from datetime import datetime
-from aiogram.types import Message
-from aiogram.types import InlineKeyboardMarkup
+from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup
 
+from app.api.user import get_user_data
 from app.dto.template import CardTemplateDTO
 from app.dto.vacancy import VacancyDTO
-from app.templates.vacancy import vacancy_card
+from app.templates.vacancy import searching_vacancies_card, vacancy_card
 
 
 def test_vacancy_card() -> CardTemplateDTO:
@@ -29,9 +30,41 @@ def test_vacancy_card() -> CardTemplateDTO:
     return msg_template
 
 async def render_vacancies(msg: Message):
+    user_data = get_user_data()
+    
+    card = searching_vacancies_card(user_data)
+    sent_msg = await msg.answer(
+        text=card.text,
+        reply_markup=InlineKeyboardMarkup(inline_keyboard=card.buttons) if card.buttons else None
+    )
+    
+    await asyncio.sleep(1.5) # test mock delay
+    
     card = test_vacancy_card()
-    await msg.answer(
+    await sent_msg.edit_text(
         text=card.text,
         reply_markup=InlineKeyboardMarkup(inline_keyboard=card.buttons) if card.buttons else None
     )
 
+async def render_vacancies_callback(cq: CallbackQuery):
+    await cq.answer()
+    
+    if not isinstance(cq.message, Message):
+        return
+    
+    user_data = get_user_data()
+    
+    card = searching_vacancies_card(user_data)
+    sent_msg = await cq.message.edit_text(
+        text=card.text,
+        reply_markup=InlineKeyboardMarkup(inline_keyboard=card.buttons) if card.buttons else None
+    )
+    
+    await asyncio.sleep(1.5) # test mock delay
+    
+    card = test_vacancy_card()
+    if isinstance(sent_msg, Message):
+        await sent_msg.edit_text(
+            text=card.text,
+            reply_markup=InlineKeyboardMarkup(inline_keyboard=card.buttons) if card.buttons else None
+        )
